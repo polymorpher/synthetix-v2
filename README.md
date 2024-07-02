@@ -32,6 +32,11 @@ Ethereum client or `ganache-cli` instance. Update other variables like
 the master address as appropriate. Then, from the root directory,
 deployment is as simple as:
 
+Install old version of Solidity
+```
+curl -L https://raw.githubusercontent.com/ethereum/homebrew-ethereum/9599ce8371d9de039988f89ed577460e58a0f56a/solidity.rb > solidity.rb && brew install solidity.rb
+```
+
 ```python3 deploy.py```
 
 Run the test suite as follows:

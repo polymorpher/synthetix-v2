@@ -2,3 +2,7 @@
 test_settings.py
 deploy_settings.py
 *.pyc
+build
+node_modules
+.idea
+brew
