@@ -1,3 +1,10 @@
+### Install dependencies and run deploy script
+```shell
+pip3 install -r requirements.txt
+python3 deploy.py
+```
+
+### Harmony deployment logs
 ```shell
 Compiling contracts...  Done!
 Deploying: Proxy constructor_args: ['0x98f0c3D42b8DaFB1f73d8F105344C6a4434a0109']
