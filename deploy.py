@@ -7,9 +7,16 @@ from utils.generalutils import TERMCOLORS
 solcx.install_solc('0.4.24')
 solcx.set_solc_version('0.4.24')
 
-BLOCKCHAIN_ADDRESS=""
 MASTER_KEY=""
 MASTER_ADDRESS=""
+BLOCKCHAIN_ADDRESS = "https://api.harmony.one"
+W3 = Web3(HTTPProvider(BLOCKCHAIN_ADDRESS))
+POLLING_INTERVAL = 0.1
+STATUS_ALIGN_SPACING = 6
+
+# The number representing 1 in our contracts.
+UNIT = 10**18
+ZERO_ADDRESS = "0x" + "0" * 40
 
 # Source files to compile from
 SOLIDITY_SOURCES = ["contracts/Havven.sol",
@@ -19,16 +26,6 @@ SOLIDITY_SOURCES = ["contracts/Havven.sol",
                     "contracts/ExternStateToken.sol",
                    #  "contracts/DestructibleExternStateToken.sol",
                     "contracts/Proxy.sol"]
-
-
-BLOCKCHAIN_ADDRESS = "http://localhost:8545"
-W3 = Web3(HTTPProvider(BLOCKCHAIN_ADDRESS))
-POLLING_INTERVAL = 0.1
-STATUS_ALIGN_SPACING = 6
-
-# The number representing 1 in our contracts.
-UNIT = 10**18
-ZERO_ADDRESS = "0x" + "0" * 40
 
 
 def attempt(function, func_args, init_string, func_kwargs=None, print_status=True, print_exception=True):
@@ -57,7 +54,7 @@ def sign_and_mine_txs(from_acc, key, txs):
     receipts = []
     for item in txs:
         print("Sending transaction")
-        tx = item.buildTransaction({
+        tx = item.build_transaction({
             'from': from_acc,
             'gasPrice': W3.toWei('5', 'gwei'),
             'nonce': W3.eth.getTransactionCount(from_acc, "pending")
@@ -86,20 +83,23 @@ def compile_contracts(files, remappings=None):
 def attempt_deploy_signed(compiled_sol, contract_name, from_acc, key, constructor_args=None, gas=6000000):
     if constructor_args is None:
         constructor_args = []
-    print("Deploying", contract_name)
+    print("Deploying:", contract_name)
     if compiled_sol is not None:
-            contract_interface = compiled_sol[contract_name]
-            contract = W3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bin'])
-            const_f = contract.constructor(*constructor_args)
-            tx = const_f.buildTransaction({'from': from_acc, 'nonce': W3.eth.getTransactionCount(from_acc), 'gas': gas})
-            tx['gasPrice'] = W3.toWei('5', 'gwei')
-            signed = W3.eth.account.signTransaction(tx, key)
-            txh = W3.eth.sendRawTransaction(signed.rawTransaction)
-            txn_receipt = W3.eth.waitForTransactionReceipt(txh)
-            address = txn_receipt.contractAddress
-            print("Deployed to", address)
-            contract.address = address
-            return contract, txn_receipt
+        contract_interface = compiled_sol[contract_name]
+        contract = W3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bin'])
+        const_f = contract.constructor(*constructor_args)
+        nonce = W3.eth.get_transaction_count(from_acc)
+        print("Nonce:", nonce, "gas:", gas)
+        tx = const_f.build_transaction({'from': from_acc, 'nonce': nonce, 'gas': gas})
+        print("TX created!")
+        tx['gasPrice'] = W3.toWei('5', 'gwei')
+        signed = W3.eth.account.signTransaction(tx, key)
+        txh = W3.eth.sendRawTransaction(signed.rawTransaction)
+        txn_receipt = W3.eth.waitForTransactionReceipt(txh)
+        address = txn_receipt.contractAddress
+        print("Deployed to", address)
+        contract.address = address
+        return contract, txn_receipt
 
 
 def deploy_havven(print_addresses=True):
