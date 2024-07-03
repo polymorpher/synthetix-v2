@@ -56,14 +56,15 @@ def sign_and_mine_txs(from_acc, key, txs):
         print("Sending transaction")
         tx = item.build_transaction({
             'from': from_acc,
-            'gasPrice': W3.toWei('5', 'gwei'),
-            'nonce': W3.eth.getTransactionCount(from_acc, "pending")
+            'to': from_acc,
+            'gas': 30000000,
+            'gasPrice': W3.to_wei('100', 'gwei'),
+            'nonce': W3.eth.get_transaction_count(from_acc, "pending")
         })
-        tx['gas'] = W3.eth.estimateGas(tx)
-        signed = W3.eth.account.signTransaction(tx, key)
-        txh = W3.eth.sendRawTransaction(signed.rawTransaction)
-        print("Transaction hash:", txh)
-        txn_receipt = W3.eth.waitForTransactionReceipt(txh)
+        signed = W3.eth.account.sign_transaction(tx, key)
+        txh = W3.eth.send_raw_transaction(signed.raw_transaction)
+        print("Transaction hash:", "0x"+txh.hex())
+        txn_receipt = W3.eth.wait_for_transaction_receipt(txh)
         print("Transaction accepted")
         receipts.append(txn_receipt)
     return receipts
@@ -80,24 +81,22 @@ def compile_contracts(files, remappings=None):
     return contract_interfaces
 
 
-def attempt_deploy_signed(compiled_sol, contract_name, from_acc, key, constructor_args=None, gas=6000000):
+def attempt_deploy_signed(compiled_sol, contract_name, from_acc, key, constructor_args=None, gas=5000000):
     if constructor_args is None:
         constructor_args = []
-    print("Deploying:", contract_name)
+    print("Deploying:", contract_name, "constructor_args:", constructor_args)
     if compiled_sol is not None:
         contract_interface = compiled_sol[contract_name]
         contract = W3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bin'])
         const_f = contract.constructor(*constructor_args)
         nonce = W3.eth.get_transaction_count(from_acc)
-        print("Nonce:", nonce, "gas:", gas)
-        tx = const_f.build_transaction({'from': from_acc, 'nonce': nonce, 'gas': gas})
-        print("TX created!")
-        tx['gasPrice'] = W3.toWei('5', 'gwei')
-        signed = W3.eth.account.signTransaction(tx, key)
-        txh = W3.eth.sendRawTransaction(signed.rawTransaction)
-        txn_receipt = W3.eth.waitForTransactionReceipt(txh)
+        # print("Nonce:", nonce, "gas:", gas)
+        tx = const_f.build_transaction({'from': from_acc, 'nonce': nonce, 'gas':gas, 'gasPrice': W3.to_wei('100', 'gwei')})
+        signed = W3.eth.account.sign_transaction(tx, key)
+        txh = W3.eth.send_raw_transaction(signed.raw_transaction)
+        txn_receipt = W3.eth.wait_for_transaction_receipt(txh)
         address = txn_receipt.contractAddress
-        print("Deployed to", address)
+        print("Deployed to:", address, "txnHash:", "0x"+txh.hex())
         contract.address = address
         return contract, txn_receipt
 
@@ -119,11 +118,11 @@ def deploy_havven(print_addresses=True):
 
         havven_contract, hvn_txr = attempt_deploy_signed(
             compiled, 'Havven', MASTER_ADDRESS, MASTER_KEY,
-            [havven_proxy.address, ZERO_ADDRESS, MASTER_ADDRESS, MASTER_ADDRESS, UNIT // 2]
+            [havven_proxy.address, ZERO_ADDRESS, MASTER_ADDRESS, MASTER_ADDRESS, UNIT // 2, [MASTER_ADDRESS], ZERO_ADDRESS]
         )
         nomin_contract, nom_txr = attempt_deploy_signed(
             compiled, 'Nomin', MASTER_ADDRESS, MASTER_KEY,
-            [nomin_proxy.address, havven_contract.address, MASTER_ADDRESS, ZERO_ADDRESS]
+            [nomin_proxy.address, MASTER_ADDRESS, havven_contract.address, 1000000000, MASTER_ADDRESS]
         )
 
         court_contract, court_txr = attempt_deploy_signed(
