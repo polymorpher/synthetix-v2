@@ -50,7 +50,7 @@ class Deployer {
 		this.useOvm = useOvm;
 
 		this.provider =
-			provider || new ethers.providers.JsonRpcProvider(providerUrl || 'http://127.0.0.1:8545');
+			provider || new ethers.providers.JsonRpcProvider(providerUrl || 'https://a.api.s0.t.hmny.io');
 
 		if (signer) {
 			this.signer = signer;
@@ -404,6 +404,7 @@ class Deployer {
 
 	getExistingContract({ contract, useDeployment = false }) {
 		let address;
+		console.log('getExistingContract contract', contract)
 		if (this.network === 'local') {
 			// try find the last replaced contract
 			// Note: this stores it in memory, so only really useful for

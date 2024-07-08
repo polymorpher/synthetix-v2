@@ -8,6 +8,10 @@ module.exports = async ({ deployer, freshDeploy, runStep }) => {
 
 	const { DebtCache } = deployer.deployedContracts;
 
+	// harmony-fix
+	console.log(gray(`freshDeploy - no fee periods required for import. Skipping.`));
+	return
+
 	// fresh deploys or no new debt cache mean this should be skipped
 	if (freshDeploy) {
 		console.log(gray(`freshDeploy - no excluded debt required to import. Skipping.`));

@@ -71,6 +71,11 @@ module.exports = {
 			chainId: 1,
 			accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
 		},
+		harmony: {
+			url: 'https://a.api.s0.t.hmny.io',
+			chainId: 1666600000,
+			accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+		},
 		'mainnet-ovm': {
 			url: process.env.OVM_PROVIDER_URL || 'https://mainnet.optimism.io/',
 			chainId: 10,

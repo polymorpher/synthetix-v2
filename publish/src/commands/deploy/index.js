@@ -165,7 +165,7 @@ const deploy = async ({
 		);
 	}
 
-	console.log(gray('Loading the compiled contracts locally...'));
+	console.log(gray('Loading the compiled contracts locally...', buildPath));
 	const { earliestCompiledTimestamp, compiled } = loadCompiledFiles({ buildPath });
 
 	const { privateKey: envPrivateKey, explorerLinkPrefix } = loadConnections({
@@ -221,6 +221,8 @@ const deploy = async ({
 
 	nonceManager.provider = deployer.provider;
 	nonceManager.account = account;
+
+	console.log('Start fetching data...')
 
 	const {
 		currentSynthetixSupply,

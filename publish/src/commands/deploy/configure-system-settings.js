@@ -31,10 +31,12 @@ module.exports = async ({
 
 	console.log(gray(`\n------ CONFIGURE SYSTEM SETTINGS ------\n`));
 
-	let previousSystemSettings = deployer.getExistingContract({ contract: 'SystemSettings' });
+	// harmony-fix
+	let previousSystemSettings = undefined
+	// let previousSystemSettings = deployer.getExistingContract({ contract: 'SystemSettings' });
 
 	// when there is no new system settings, or when not doing generateSolidity, than just read from ourself
-	if (SystemSettings.address === previousSystemSettings.address || !generateSolidity) {
+	if (SystemSettings.address === previousSystemSettings?.address || !generateSolidity) {
 		previousSystemSettings = undefined;
 	} else {
 		// otherwise when there's a new system setting, we want to be reading from the old
@@ -42,7 +44,7 @@ module.exports = async ({
 		// when upgrading SystemSettings
 		console.log(
 			gray(
-				`New SystemSettings detected. Using the existing one at ${previousSystemSettings.address} to read from`
+				`New SystemSettings detected. Using the existing one at ${previousSystemSettings?.address} to read from`
 			)
 		);
 	}

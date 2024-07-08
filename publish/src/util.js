@@ -186,7 +186,7 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 				providerUrl = process.env.OVM_SEPOLIA_PROVIDER_URL;
 			}
 		} else {
-			if (network === 'mainnet' && process.env.PROVIDER_URL_MAINNET) {
+			if ((network === 'mainnet' || network === 'harmony') && process.env.PROVIDER_URL_MAINNET) {
 				providerUrl = process.env.PROVIDER_URL_MAINNET;
 			} else {
 				providerUrl = process.env.PROVIDER_URL.replace('network', network);
@@ -195,7 +195,7 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 	}
 
 	const privateKey =
-		network === 'mainnet' ? process.env.DEPLOY_PRIVATE_KEY : process.env.TESTNET_DEPLOY_PRIVATE_KEY;
+		(network === 'mainnet' || network === 'harmony') ? process.env.DEPLOY_PRIVATE_KEY : process.env.TESTNET_DEPLOY_PRIVATE_KEY;
 
 	const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
 		useOvm ? '-optimistic' : ''

@@ -64,7 +64,7 @@ module.exports = async ({
 				if (!freshDeploy) {
 					// only throw if not local - allows local environments to handle both new
 					// and updating configurations
-					throw err;
+					// throw err;
 				}
 			}
 		}

@@ -10,13 +10,14 @@ const data = {
 	'sepolia-ovm': require('./publish/deployed/sepolia-ovm'),
 	'local-ovm': require('./publish/deployed/local-ovm'),
 	'mainnet-ovm': require('./publish/deployed/mainnet-ovm'),
+	harmony: require('./publish/deployed/harmony'),
 };
 
 const assets = require('./publish/assets.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'mainnet', 'sepolia'];
+const networks = ['local', 'mainnet', 'sepolia', 'harmony'];
 
 const chainIdMapping = Object.entries({
 	1: {
@@ -37,6 +38,10 @@ const chainIdMapping = Object.entries({
 	},
 	11155420: {
 		network: 'sepolia',
+		useOvm: true,
+	},
+	1666600000: {
+		network: 'harmony',
 		useOvm: true,
 	},
 

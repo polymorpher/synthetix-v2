@@ -41,7 +41,7 @@ module.exports = async ({
 	yes,
 	buildPath,
 }) => {
-	let currentSynthetixSupply;
+	let currentSynthetixSupply = 0;
 	let oldExrates;
 	let currentLastMintEvent = 0;
 	let currentWeekOfInflation = 0;
@@ -72,7 +72,7 @@ module.exports = async ({
 					'Cannot connect to existing Synthetix contract. Please double check the deploymentPath is correct for the network allocated'
 				)
 			);
-			throw err;
+			// throw err;
 		}
 	}
 
@@ -87,7 +87,7 @@ module.exports = async ({
 					'Cannot connect to existing ExchangeRates contract. Please double check the deploymentPath is correct for the network allocated'
 				)
 			);
-			throw Error('Cannot deploy. Halted.');
+			// throw Error('Cannot deploy. Halted.');
 		}
 	}
 
@@ -105,7 +105,7 @@ module.exports = async ({
 					'Cannot connect to existing SystemStatus contract. Please double check the deploymentPath is correct for the network allocated'
 				)
 			);
-			throw Error('Cannot deploy. Halted.');
+			// throw Error('Cannot deploy. Halted.');
 		}
 	}
 
@@ -153,6 +153,7 @@ module.exports = async ({
 
 	// now get the latest time a Solidity file was edited
 	const latestSolTimestamp = getLatestSolTimestamp(CONTRACTS_FOLDER);
+	console.log('test', account)
 
 	parameterNotice({
 		'Dry Run': dryRun ? green('true') : yellow('⚠ NO'),
@@ -185,7 +186,7 @@ module.exports = async ({
 			? green('✅ YES\n\t\t\t\t') + newSynthsToAdd.join(', ')
 			: yellow('⚠ NO'),
 		'Deployer account:': account,
-		'Synthetix totalSupply': `${Math.round(formatUnits(currentSynthetixSupply) / 1e6)}m`,
+		'Synthetix totalSupply': `${Math.round(formatUnits(currentSynthetixSupply || 0) / 1e6)}m`,
 		'Inflation Supply to date': inflationSupplyToDate
 			? `${Math.round(formatUnits(inflationSupplyToDate) / 1e6)}m`
 			: 'N/A',

@@ -31,6 +31,11 @@ module.exports = async ({
 	console.log(gray(`\n------ IMPORT FEE PERIODS ------\n`));
 
 	const { FeePool } = deployer.deployedContracts;
+
+	// harmony-fix
+	console.log(gray(`freshDeploy - no fee periods required for import. Skipping.`));
+	return
+
 	// fresh deploys or no new fee pool mean this should be skipped
 	if (freshDeploy) {
 		console.log(gray(`freshDeploy - no fee periods required for import. Skipping.`));

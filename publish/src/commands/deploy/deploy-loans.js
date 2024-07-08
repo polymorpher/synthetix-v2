@@ -14,7 +14,8 @@ module.exports = async ({ account, addressOf, deployer, getDeployParameter, netw
 		args: [account, account, addressOf(ReadProxyAddressResolver)],
 	});
 
-	let WETH_ADDRESS = (await getDeployParameter('WETH_ERC20_ADDRESSES'))[network];
+	// harmony-fix
+	let WETH_ADDRESS = '0xF720b7910C6b2FF5bd167171aDa211E226740bfe' // (await getDeployParameter('WETH_ERC20_ADDRESSES'))[network];
 
 	if (network === 'local') {
 		// OVM already has a deployment of WETH, however since we use
@@ -92,9 +93,11 @@ module.exports = async ({ account, addressOf, deployer, getDeployParameter, netw
 		],
 	});
 
-	let RENBTC_ADDRESS = (await getDeployParameter('RENBTC_ERC20_ADDRESSES'))[network];
+	// harmony-fix WONE 0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a
+	let RENBTC_ADDRESS = '0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a' //(await getDeployParameter('RENBTC_ERC20_ADDRESSES'))[network];
 	if (!RENBTC_ADDRESS) {
 		if (network !== 'local') {
+			// harmony-fix
 			throw new Error('renBTC address is not known');
 		}
 
