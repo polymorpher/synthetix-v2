@@ -2,18 +2,22 @@ name = "synthetix"
 description = "Infinite liquidity is here."
 version = "<%= package.version %>"
 
+#[deploy]
+#create2 = "0x6af4891D4740a75b52eD18B24CC737AAF8BBF1B6"
+
 # overrides the deployed contracts used by the deployer
 # not to be confused with the cannon network
+
 [setting.network]
 defaultValue = "local"
 
 # contracts will be owned by the specified address (defaults to the first known test address)
 [setting.owner]
-defaultValue = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+defaultValue = "0x74884F4D1ED5debb853cf26bDf2EBB8eC44D5340"
 
 # some snx and sUSD will be minted by this address
 [setting.test_user]
-defaultValue = "0x48914229deDd5A9922f44441ffCCfC2Cb7856Ee9"
+defaultValue = "0x585921ed48e7d6067b751E1CEf4e8E6628C4A5cf"
 
 # how much should SNX be worth (6 decimals)
 [setting.rate_snx]
