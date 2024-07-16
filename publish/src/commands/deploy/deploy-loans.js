@@ -93,8 +93,8 @@ module.exports = async ({ account, addressOf, deployer, getDeployParameter, netw
 		],
 	});
 
-	// harmony-fix WONE 0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a
-	let RENBTC_ADDRESS = '0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a' //(await getDeployParameter('RENBTC_ERC20_ADDRESSES'))[network];
+	// harmony-fix
+	let RENBTC_ADDRESS = '0x41CA97b94D5deE79195856034D196dDfa0D43EDD' //(await getDeployParameter('RENBTC_ERC20_ADDRESSES'))[network];
 	if (!RENBTC_ADDRESS) {
 		if (network !== 'local') {
 			// harmony-fix
