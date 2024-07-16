@@ -72,7 +72,7 @@ module.exports = {
 			accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
 		},
 		harmony: {
-			url: 'https://a.api.s0.t.hmny.io',
+			url: 'https://api.harmony.one',
 			chainId: 1666600000,
 			accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
 		},
