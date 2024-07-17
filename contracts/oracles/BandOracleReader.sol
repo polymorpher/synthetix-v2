@@ -44,13 +44,13 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
             round = data.lastUpdatedBase;
         }
         roundData[round] = int256(data.rate);
-        return RateAtRound(data.rate, round);
+        return RateAtRound(int256(data.rate), round);
     }
 
     // Owner functions
 
     function withdraw() external onlyOwner {
-        (bool success, ) = owner.call.value(address(this).balance)();
+        (bool success, ) = owner.call.value(address(this).balance)("");
         require(success, "withdrawal failed");
     }
 
@@ -89,11 +89,11 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         external
         view
         returns (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
+            uint80, /*roundId*/
+            int256, /*answer*/
+            uint256, /*startedAt*/
+            uint256, /*updatedAt*/
+            uint80 /*answeredInRound*/
         )
     {
         // There is no interface from Band oracle to retrieve previous round data
@@ -101,9 +101,9 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         if (uint256(_roundId) == block.timestamp) {
             return _latestRoundData();
         }
-        int256 data = roundData[uint256(roundId)];
+        int256 data = roundData[uint256(_roundId)];
         if (data != 0) {
-            return (roundId, data, roundId, roundId, roundId);
+            return (_roundId, data, _roundId, _roundId, _roundId);
         }
         return (0, 0, 0, 0, 0);
     }
@@ -112,11 +112,11 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         external
         view
         returns (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
+            uint80, /*roundId*/
+            int256, /*answer*/
+            uint256, /*startedAt*/
+            uint256, /*updatedAt*/
+            uint80 /*answeredInRound*/
         )
     {
         return _latestRoundData();
@@ -126,68 +126,114 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         internal
         view
         returns (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
+            uint80, /*roundId*/
+            int256, /*answer*/
+            uint256, /*startedAt*/
+            uint256, /*updatedAt*/
+            uint80 /*answeredInRound*/
         )
     {
-        RateAtRound memory rr = pullDataAndCache();
-        return (uint80(rr.round), rr.rate, rr.round, rr.round, uint80(rr.round));
+        IStdReference.ReferenceData memory data = bandOracle.getReferenceData(base, quote);
+        uint256 round = block.timestamp;
+        if (data.lastUpdatedBase != 0) {
+            round = data.lastUpdatedBase;
+        }
+        return (uint80(round), int256(data.rate), round, round, uint80(round));
     }
 
     // =============================================
 
     // ========= Pyth Interface =========
     function _getPrice() internal view returns (PythStructs.Price memory price) {
-        (, int256 rate, uint256 time, , , ) = _latestRoundData();
+        (, int256 rate, uint256 time, , ) = _latestRoundData();
         price.publishTime = time;
         price.conf = 0;
-        price.expo = 18;
-        price.price = rate;
-        return;
+        price.expo = 9;
+        price.price = int64(rate / 1e9);
+        return price;
     }
 
-    function getValidTimePeriod() external view returns (uint validTimePeriod) {
+    function getValidTimePeriod()
+        external
+        view
+        returns (
+            uint /*validTimePeriod*/
+        )
+    {
         revert(NOT_IMPLEMENTED);
     }
 
     function getPrice(
         bytes32 /*id*/
-    ) external view returns (PythStructs.Price memory price) {
+    )
+        external
+        view
+        returns (
+            PythStructs.Price memory /*price*/
+        )
+    {
         return _getPrice();
     }
 
     function getEmaPrice(
         bytes32 /*id*/
-    ) external view returns (PythStructs.Price memory price) {
+    )
+        external
+        view
+        returns (
+            PythStructs.Price memory /*price*/
+        )
+    {
         revert(NOT_IMPLEMENTED);
     }
 
     function getPriceUnsafe(
         bytes32 /*id*/
-    ) external view returns (PythStructs.Price memory price) {
+    )
+        external
+        view
+        returns (
+            PythStructs.Price memory /*price*/
+        )
+    {
         return _getPrice();
     }
 
     function getPriceNoOlderThan(
         bytes32, /*id*/
         uint /*age*/
-    ) external view returns (PythStructs.Price memory price) {
+    )
+        external
+        view
+        returns (
+            PythStructs.Price memory /*price*/
+        )
+    {
         revert(NOT_IMPLEMENTED);
     }
 
     function getEmaPriceUnsafe(
         bytes32 /*id*/
-    ) external view returns (PythStructs.Price memory price) {
+    )
+        external
+        view
+        returns (
+            PythStructs.Price memory /*price*/
+        )
+    {
         revert(NOT_IMPLEMENTED);
     }
 
     function getEmaPriceNoOlderThan(
         bytes32, /*id*/
         uint /*age*/
-    ) external view returns (PythStructs.Price memory price) {
+    )
+        external
+        view
+        returns (
+            PythStructs.Price memory /*price*/
+        )
+    {
         revert(NOT_IMPLEMENTED);
     }
 
@@ -214,7 +260,13 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         bytes32[] calldata priceIds,
         uint64 minPublishTime,
         uint64 maxPublishTime
-    ) external payable returns (PythStructs.PriceFeed[] memory priceFeeds) {
+    )
+        external
+        payable
+        returns (
+            PythStructs.PriceFeed[] memory /*priceFeeds*/
+        )
+    {
         revert(NOT_IMPLEMENTED);
     }
     // =============================================
