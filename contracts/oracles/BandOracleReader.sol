@@ -25,7 +25,12 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         uint256 round;
     }
 
-    constructor(IStdReference _bandOracle, string memory _base, string memory _quote, uint256 _updateFee){
+    constructor(
+        IStdReference _bandOracle,
+        string memory _base,
+        string memory _quote,
+        uint256 _updateFee
+    ) {
         bandOracle = _bandOracle;
         base = _base;
         quote = _quote;
@@ -41,6 +46,7 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         roundData[round] = int256(data.rate);
         return RateAtRound(data.rate, round);
     }
+
     // Owner functions
 
     function withdraw() external onlyOwner {
@@ -67,24 +73,29 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         return 18;
     }
 
-    function getAnswer(uint256 /*roundId*/) external view returns (int256){
+    function getAnswer(
+        uint256 /*roundId*/
+    ) external view returns (int256) {
         revert(NOT_IMPLEMENTED);
     }
 
-    function getTimestamp(uint256 /*roundId*/) external view returns (uint256){
+    function getTimestamp(
+        uint256 /*roundId*/
+    ) external view returns (uint256) {
         revert(NOT_IMPLEMENTED);
     }
 
     function getRoundData(uint80 _roundId)
-    external
-    view
-    returns (
-        uint80 roundId,
-        int256 answer,
-        uint256 startedAt,
-        uint256 updatedAt,
-        uint80 answeredInRound
-    ) {
+        external
+        view
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        )
+    {
         // There is no interface from Band oracle to retrieve previous round data
         // return previous round data if we have it, otherwise return empty data, unless round id equals block.timestamp, in which case we return the latest data
         if (uint256(_roundId) == block.timestamp) {
@@ -98,34 +109,39 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
     }
 
     function latestRoundData()
-    external
-    view
-    returns (
-        uint80 roundId,
-        int256 answer,
-        uint256 startedAt,
-        uint256 updatedAt,
-        uint80 answeredInRound
-    ){
+        external
+        view
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        )
+    {
         return _latestRoundData();
     }
 
-    function _latestRoundData() internal view returns (
-        uint80 roundId,
-        int256 answer,
-        uint256 startedAt,
-        uint256 updatedAt,
-        uint80 answeredInRound
-    ){
+    function _latestRoundData()
+        internal
+        view
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        )
+    {
         RateAtRound memory rr = pullDataAndCache();
         return (uint80(rr.round), rr.rate, rr.round, rr.round, uint80(rr.round));
-
     }
+
     // =============================================
 
     // ========= Pyth Interface =========
-    function _getPrice() internal view returns (PythStructs.Price memory price){
-        (,int256 rate, uint256 time,,,) = _latestRoundData();
+    function _getPrice() internal view returns (PythStructs.Price memory price) {
+        (, int256 rate, uint256 time, , , ) = _latestRoundData();
         price.publishTime = time;
         price.conf = 0;
         price.expo = 18;
@@ -137,43 +153,59 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         revert(NOT_IMPLEMENTED);
     }
 
-    function getPrice(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+    function getPrice(
+        bytes32 /*id*/
+    ) external view returns (PythStructs.Price memory price) {
         return _getPrice();
     }
 
-    function getEmaPrice(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+    function getEmaPrice(
+        bytes32 /*id*/
+    ) external view returns (PythStructs.Price memory price) {
         revert(NOT_IMPLEMENTED);
     }
 
-    function getPriceUnsafe(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+    function getPriceUnsafe(
+        bytes32 /*id*/
+    ) external view returns (PythStructs.Price memory price) {
         return _getPrice();
     }
 
-    function getPriceNoOlderThan(bytes32 /*id*/, uint /*age*/) external view returns (PythStructs.Price memory price){
+    function getPriceNoOlderThan(
+        bytes32, /*id*/
+        uint /*age*/
+    ) external view returns (PythStructs.Price memory price) {
         revert(NOT_IMPLEMENTED);
     }
 
-    function getEmaPriceUnsafe(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+    function getEmaPriceUnsafe(
+        bytes32 /*id*/
+    ) external view returns (PythStructs.Price memory price) {
         revert(NOT_IMPLEMENTED);
     }
 
-    function getEmaPriceNoOlderThan(bytes32 /*id*/, uint /*age*/) external view returns (PythStructs.Price memory price){
+    function getEmaPriceNoOlderThan(
+        bytes32, /*id*/
+        uint /*age*/
+    ) external view returns (PythStructs.Price memory price) {
         revert(NOT_IMPLEMENTED);
     }
 
-    function updatePriceFeeds(bytes[] calldata /*updateData*/) external payable {
+    function updatePriceFeeds(
+        bytes[] calldata /*updateData*/
+    ) external payable {
         // noop
     }
 
     function updatePriceFeedsIfNecessary(
-        bytes[] calldata /*updateData*/,
-        bytes32[] calldata /*priceIds*/,
+        bytes[] calldata, /*updateData*/
+        bytes32[] calldata, /*priceIds*/
         uint64[] calldata /*publishTimes*/
-    ) external payable{
+    ) external payable {
         // noop
     }
 
-    function getUpdateFee(bytes[] calldata updateData) external view returns (uint feeAmount){
+    function getUpdateFee(bytes[] calldata updateData) external view returns (uint feeAmount) {
         feeAmount = updateFee;
     }
 
@@ -182,7 +214,7 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         bytes32[] calldata priceIds,
         uint64 minPublishTime,
         uint64 maxPublishTime
-    ) external payable returns (PythStructs.PriceFeed[] memory priceFeeds){
+    ) external payable returns (PythStructs.PriceFeed[] memory priceFeeds) {
         revert(NOT_IMPLEMENTED);
     }
     // =============================================

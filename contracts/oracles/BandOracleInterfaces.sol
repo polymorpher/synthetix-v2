@@ -9,14 +9,11 @@ interface IStdReference {
     }
 
     /// Returns the price data for the given base/quote pair. Revert if not available.
-    function getReferenceData(string memory _base, string memory _quote)
-    external
-    view
-    returns (ReferenceData memory);
+    function getReferenceData(string memory _base, string memory _quote) external view returns (ReferenceData memory);
 
     /// Similar to getReferenceData, but with multiple base/quote pairs at once.
     function getReferenceDataBulk(string[] memory _bases, string[] memory _quotes)
-    external
-    view
-    returns (ReferenceData[] memory);
+        external
+        view
+        returns (ReferenceData[] memory);
 }
