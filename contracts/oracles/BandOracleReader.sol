@@ -30,7 +30,7 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         string memory _base,
         string memory _quote,
         uint256 _updateFee
-    ) {
+    ) public {
         bandOracle = _bandOracle;
         base = _base;
         quote = _quote;
@@ -38,7 +38,7 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
     }
 
     function pullDataAndCache() public returns (RateAtRound memory) {
-        IStdReference.ReferenceData data = bandOracle.getReferenceData(base, quote);
+        IStdReference.ReferenceData memory data = bandOracle.getReferenceData(base, quote);
         uint256 round = block.timestamp;
         if (data.lastUpdatedBase != 0) {
             round = data.lastUpdatedBase;
@@ -50,7 +50,7 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
     // Owner functions
 
     function withdraw() external onlyOwner {
-        (bool success, ) = owner.call{value: address(this).balance}();
+        (bool success, ) = owner.call.value(address(this).balance)();
         require(success, "withdrawal failed");
     }
 
@@ -61,7 +61,7 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
     // ========= Chainlink interface ======
     function latestRound() external view returns (uint256) {
         // note that Band oracle sometimes return empty value for lastUpdatedBase and lastUpdatedQuote, even though they should contain the timestamp for the last update
-        IStdReference.ReferenceData data = bandOracle.getReferenceData(base, quote);
+        IStdReference.ReferenceData memory data = bandOracle.getReferenceData(base, quote);
         if (data.lastUpdatedBase != 0) {
             return data.lastUpdatedBase;
         }

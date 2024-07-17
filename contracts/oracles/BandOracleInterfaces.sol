@@ -1,4 +1,5 @@
 pragma solidity ^0.5.16;
+pragma experimental ABIEncoderV2;
 
 interface IStdReference {
     /// A structure returned whenever someone requests for standard reference data.
@@ -9,10 +10,10 @@ interface IStdReference {
     }
 
     /// Returns the price data for the given base/quote pair. Revert if not available.
-    function getReferenceData(string memory _base, string memory _quote) external view returns (ReferenceData memory);
+    function getReferenceData(string calldata _base, string calldata _quote) external view returns (ReferenceData memory);
 
     /// Similar to getReferenceData, but with multiple base/quote pairs at once.
-    function getReferenceDataBulk(string[] memory _bases, string[] memory _quotes)
+    function getReferenceDataBulk(string[] calldata _bases, string[] calldata _quotes)
         external
         view
         returns (ReferenceData[] memory);
