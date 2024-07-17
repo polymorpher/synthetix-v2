@@ -4,9 +4,10 @@ pragma experimental ABIEncoderV2;
 import {AggregatorV2V3Interface} from "../interfaces/AggregatorV2V3Interface.sol";
 import {IPyth} from "../interfaces/IPyth.sol";
 import {IStdReference} from "./BandOracleInterfaces.sol";
+import {PythStructs} from "../interfaces/PythStructs.sol";
+import {Owned} from "../Owned.sol";
 
-
-contract BandOracleReader is AggregatorV2V3Interface, IPyth {
+contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
     // only available after solidity v0.8.4
     // error NotImplemented();
     string constant NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
@@ -17,15 +18,18 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth {
 
     mapping(uint256 => int256) internal roundData;
 
+    uint256 public updateFee;
+
     struct RateAtRound {
         int256 rate;
         uint256 round;
     }
 
-    constructor(IStdReference _bandOracle, string memory _base, string memory _quote){
+    constructor(IStdReference _bandOracle, string memory _base, string memory _quote, uint256 _updateFee){
         bandOracle = _bandOracle;
         base = _base;
         quote = _quote;
+        updateFee = _updateFee;
     }
 
     function pullDataAndCache() public returns (RateAtRound memory) {
@@ -36,6 +40,16 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth {
         }
         roundData[round] = int256(data.rate);
         return RateAtRound(data.rate, round);
+    }
+    // Owner functions
+
+    function withdraw() external onlyOwner {
+        (bool success, ) = owner.call{value: address(this).balance}();
+        require(success, "withdrawal failed");
+    }
+
+    function setUpdateFee(uint256 _fee) external onlyOwner {
+        updateFee = _fee;
     }
 
     // ========= Chainlink interface ======
@@ -53,11 +67,11 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth {
         return 18;
     }
 
-    function getAnswer(uint256 roundId) external view returns (int256){
+    function getAnswer(uint256 /*roundId*/) external view returns (int256){
         revert(NOT_IMPLEMENTED);
     }
 
-    function getTimestamp(uint256 roundId) external view returns (uint256){
+    function getTimestamp(uint256 /*roundId*/) external view returns (uint256){
         revert(NOT_IMPLEMENTED);
     }
 
@@ -110,35 +124,66 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth {
     // =============================================
 
     // ========= Pyth Interface =========
-    function getValidTimePeriod() external view returns (uint validTimePeriod);
+    function _getPrice() internal view returns (PythStructs.Price memory price){
+        (,int256 rate, uint256 time,,,) = _latestRoundData();
+        price.publishTime = time;
+        price.conf = 0;
+        price.expo = 18;
+        price.price = rate;
+        return;
+    }
 
-    function getPrice(bytes32 id) external view returns (PythStructs.Price memory price);
+    function getValidTimePeriod() external view returns (uint validTimePeriod) {
+        revert(NOT_IMPLEMENTED);
+    }
 
-    function getEmaPrice(bytes32 id) external view returns (PythStructs.Price memory price);
+    function getPrice(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+        return _getPrice();
+    }
 
-    function getPriceUnsafe(bytes32 id) external view returns (PythStructs.Price memory price);
+    function getEmaPrice(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+        revert(NOT_IMPLEMENTED);
+    }
 
-    function getPriceNoOlderThan(bytes32 id, uint age) external view returns (PythStructs.Price memory price);
+    function getPriceUnsafe(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+        return _getPrice();
+    }
 
-    function getEmaPriceUnsafe(bytes32 id) external view returns (PythStructs.Price memory price);
+    function getPriceNoOlderThan(bytes32 /*id*/, uint /*age*/) external view returns (PythStructs.Price memory price){
+        revert(NOT_IMPLEMENTED);
+    }
 
-    function getEmaPriceNoOlderThan(bytes32 id, uint age) external view returns (PythStructs.Price memory price);
+    function getEmaPriceUnsafe(bytes32 /*id*/) external view returns (PythStructs.Price memory price){
+        revert(NOT_IMPLEMENTED);
+    }
 
-    function updatePriceFeeds(bytes[] calldata updateData) external payable;
+    function getEmaPriceNoOlderThan(bytes32 /*id*/, uint /*age*/) external view returns (PythStructs.Price memory price){
+        revert(NOT_IMPLEMENTED);
+    }
+
+    function updatePriceFeeds(bytes[] calldata /*updateData*/) external payable {
+        // noop
+    }
 
     function updatePriceFeedsIfNecessary(
-        bytes[] calldata updateData,
-        bytes32[] calldata priceIds,
-        uint64[] calldata publishTimes
-    ) external payable;
+        bytes[] calldata /*updateData*/,
+        bytes32[] calldata /*priceIds*/,
+        uint64[] calldata /*publishTimes*/
+    ) external payable{
+        // noop
+    }
 
-    function getUpdateFee(bytes[] calldata updateData) external view returns (uint feeAmount);
+    function getUpdateFee(bytes[] calldata updateData) external view returns (uint feeAmount){
+        feeAmount = updateFee;
+    }
 
     function parsePriceFeedUpdates(
         bytes[] calldata updateData,
         bytes32[] calldata priceIds,
         uint64 minPublishTime,
         uint64 maxPublishTime
-    ) external payable returns (PythStructs.PriceFeed[] memory priceFeeds);
+    ) external payable returns (PythStructs.PriceFeed[] memory priceFeeds){
+        revert(NOT_IMPLEMENTED);
+    }
     // =============================================
 }
