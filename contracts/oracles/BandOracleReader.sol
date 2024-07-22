@@ -29,8 +29,9 @@ contract BandOracleReader is AggregatorV2V3Interface, IPyth, Owned {
         IStdReference _bandOracle,
         string memory _base,
         string memory _quote,
-        uint256 _updateFee
-    ) public {
+        uint256 _updateFee,
+        address _owner
+    ) public Owned(_owner) {
         bandOracle = _bandOracle;
         base = _base;
         quote = _quote;
